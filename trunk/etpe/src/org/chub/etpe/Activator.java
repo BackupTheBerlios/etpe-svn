@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.chub.etpe.console.EtpeConsole;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -35,6 +38,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[]{new EtpeConsole()});
 	}
 
 	/*
