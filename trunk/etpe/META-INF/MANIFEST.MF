@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ETPE plugin
+Bundle-SymbolicName: ETPE;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.chub.etpe.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.jface.text
+Eclipse-LazyStart: true
+Bundle-ClassPath: jython.jar,
+ .
+Bundle-Vendor: chub

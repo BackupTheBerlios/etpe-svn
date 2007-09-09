@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="baseline.jar"/>
+	<classpathentry exported="true" kind="lib" path="jython.jar"/>
+	<classpathentry exported="true" kind="lib" path="swt-grouplayout.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/prog/eclipse/plugins/org.eclipse.ui.forms_3.2.0.v20060602.jar" sourcepath="D:/prog/eclipse/plugins/org.eclipse.platform.source_3.2.2.r322_v20070119-RQghndJN8IM0MsK/src/org.eclipse.ui.forms_3.2.0.v20060602/src.zip"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
