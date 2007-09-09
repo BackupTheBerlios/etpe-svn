@@ -1,0 +1,3 @@
+* redirect python output to console
+* find a way to allow key binding to run the script
+* write more and more script !!!

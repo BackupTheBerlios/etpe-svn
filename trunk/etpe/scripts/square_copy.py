@@ -9,7 +9,7 @@ class square_copy(Engine):
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(StringSelection(txt), None)
 
 	def getReplaceType(self):
-		return 0
+		return Engine.REPLACE_NONE
 	
 	def filter(self, text, startOffset, endOffset, startLine, endLine):
 		inBuf = StringIO.StringIO(text)

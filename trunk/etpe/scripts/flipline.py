@@ -4,7 +4,7 @@ import StringIO
 
 class flipline(Engine):
 	def getReplaceType(self):
-		return 1
+		return Engine.REPLACE_ALL
 	
 	def filter(self, text, startOffset, endOffset, startLine, endLine):
 		inBuf = StringIO.StringIO(text)

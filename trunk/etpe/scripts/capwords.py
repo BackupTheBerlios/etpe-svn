@@ -3,7 +3,7 @@ import string
 
 class capwords(Engine):
 	def getReplaceType(self):
-		return 2
+		return Engine.REPLACE_SELECTION
 	
 	def filter(self, text, startOffset, endOffset, startLine, endLine):
 		selection = text[startOffset : endOffset]
