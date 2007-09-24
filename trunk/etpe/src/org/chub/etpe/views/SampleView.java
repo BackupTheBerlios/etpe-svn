@@ -25,9 +25,10 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.grouplayout.GroupLayout;
+import org.eclipse.swt.layout.grouplayout.LayoutStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -36,8 +37,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
-
-import swing2swt.layout.BorderLayout;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -57,9 +56,10 @@ import swing2swt.layout.BorderLayout;
 public class SampleView extends ViewPart
 {
 
+	private Text text;
+	private Text descr;
 	private Tree tree;
 
-	private Text text;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -82,24 +82,53 @@ public class SampleView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
+		
 
-		parent.setLayout(new BorderLayout(0, 0));
+		tree = new Tree(parent, SWT.FULL_SELECTION | SWT.BORDER);
+		tree.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e)
+			{
+				String scriptName = tree.getSelection()[0].getText();
+				String catName = null;
+				TreeItem treei = tree.getSelection()[0].getParentItem();
+				if (treei != null)
+					catName = treei.getText();
+				descr.setText(getScriptDescription(catName, scriptName));
+				tree.setToolTipText(getScriptDescription(catName, scriptName));
+			}
+		});
+		tree.addKeyListener(new KeyAdapter()
+		{
+			public void keyReleased(KeyEvent e)
+			{
+				if (e.keyCode == SWT.CR)
+				{
+					String catName = null;
+					TreeItem treei = tree.getSelection()[0].getParentItem();
+					if (treei != null)
+						catName = treei.getText();
+					String scriptName = tree.getSelection()[0].getText();
+					runScrit(catName ,scriptName);
+				}
+			}
+		});
+		tree.addMouseListener(new MouseAdapter()
+		{
+			public void mouseDoubleClick(MouseEvent e)
+			{
+				String catName = null;
+				TreeItem treei = tree.getSelection()[0].getParentItem();
+				if (treei != null)
+					catName = treei.getText();
+				String scriptName = tree.getSelection()[0].getText();
+				runScrit(catName, scriptName);
+			}
+		});
+		tree.setLinesVisible(true);
 
-		final Composite composite = new Composite(parent, SWT.EMBEDDED);
-		composite.setLayout(new FormLayout());
-		composite.setLayoutData(BorderLayout.NORTH);
+		descr = new Text(parent, SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
 
-		Label filtreLabel;
-		filtreLabel = new Label(composite, SWT.WRAP);
-		final FormData fd_filtreLabel = new FormData();
-		fd_filtreLabel.right = new FormAttachment(0, 50);
-		fd_filtreLabel.bottom = new FormAttachment(0, 19);
-		fd_filtreLabel.top = new FormAttachment(0, 0);
-		fd_filtreLabel.left = new FormAttachment(0, 0);
-		filtreLabel.setLayoutData(fd_filtreLabel);
-		filtreLabel.setText("   search   ");
-
-		text = new Text(composite, SWT.BORDER);
+		text = new Text(parent, SWT.BORDER);
 		text.addKeyListener(new KeyAdapter()
 		{
 			public void keyReleased(KeyEvent e)
@@ -114,46 +143,66 @@ public class SampleView extends ViewPart
 					{
 						tree.setSelection(t);
 						if (!txt.isEmpty() && e.keyCode == SWT.CR)
-							runScrit(name);
+						{
+							String catName = null;
+							TreeItem treei = tree.getSelection()[0].getParentItem();
+							if (treei != null)
+								catName = treei.getText();
+							runScrit(catName, name);
+						}
 						return;
 					}
 				}
 			}
 		});
-		final FormData fd_text = new FormData();
-		fd_text.left = new FormAttachment(filtreLabel, 0, SWT.RIGHT);
-		fd_text.right = new FormAttachment(100, -5);
-		fd_text.bottom = new FormAttachment(0, 19);
-		fd_text.top = new FormAttachment(0, 0);
-		text.setLayoutData(fd_text);
 
-		tree = new Tree(parent, SWT.FULL_SELECTION | SWT.BORDER);
-		tree.addKeyListener(new KeyAdapter()
-		{
-			public void keyReleased(KeyEvent e)
-			{
-				if (e.keyCode == SWT.CR)
-				{
-					String scriptName = tree.getSelection()[0].getText();
-					runScrit(scriptName);
-				}
-			}
-		});
-		tree.addMouseListener(new MouseAdapter()
-		{
-			public void mouseDoubleClick(MouseEvent e)
-			{
-				String scriptName = tree.getSelection()[0].getText();
-				runScrit(scriptName);
-			}
-		});
-		tree.setLinesVisible(true);
-		tree.setLayoutData(BorderLayout.CENTER);
+		Label searchLabel;
+		searchLabel = new Label(parent, SWT.NONE);
+		searchLabel.setText("search");
+		
+		final GroupLayout groupLayout = new GroupLayout(parent);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(GroupLayout.LEADING)
+				.add(groupLayout.createSequentialGroup()
+					.add(searchLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(LayoutStyle.RELATED)
+					.add(text, GroupLayout.PREFERRED_SIZE, 484, Short.MAX_VALUE)
+					.addContainerGap())
+				.add(groupLayout.createSequentialGroup()
+					.add(10, 10, 10)
+					.add(groupLayout.createParallelGroup(GroupLayout.LEADING)
+						.add(GroupLayout.TRAILING, descr, GroupLayout.PREFERRED_SIZE, 519, Short.MAX_VALUE)
+						.add(GroupLayout.TRAILING, tree, GroupLayout.PREFERRED_SIZE, 519, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(GroupLayout.LEADING)
+				.add(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.add(groupLayout.createParallelGroup(GroupLayout.BASELINE)
+						.add(searchLabel)
+						.add(text, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(LayoutStyle.RELATED)
+					.add(tree, GroupLayout.PREFERRED_SIZE, 91, Short.MAX_VALUE)
+					.addPreferredGap(LayoutStyle.RELATED)
+					.add(descr, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
+		);
+		parent.setLayout(groupLayout);
 
-		for (String s : buildFilterList())
+		for (String c : buildCatList())
 		{
 			TreeItem newItemTreeItem = new TreeItem(tree, SWT.NONE);
-			newItemTreeItem.setText(s);
+			newItemTreeItem.setText(c);
+			for (String s: buildFilterList(c))
+			{
+				TreeItem treeItem2 = new TreeItem(newItemTreeItem, SWT.NONE);
+				treeItem2.setText(s);
+			}
+		}
+		for (String s: buildFilterList("."))
+		{
+			TreeItem treeItem2 = new TreeItem(tree, SWT.NONE);
+			treeItem2.setText(s);
 		}
 		makeActions();
 		hookContextMenu();
@@ -212,7 +261,21 @@ public class SampleView extends ViewPart
 	{
 	}
 
-	private ArrayList<String> buildFilterList()
+	
+	
+	private ArrayList<String> buildCatList()
+	{
+		ArrayList<String> sliste = new ArrayList<String>();
+		File dir = new File(Activator.getPluginPath() + "/scripts");
+		for (File f : dir.listFiles())
+		{
+			if (f.isDirectory() && !f.getName().startsWith("."))
+				sliste.add(f.getName());
+		}
+		return sliste;
+	}
+
+	private ArrayList<String> buildFilterList(String parent)
 	{
 		ArrayList<String> sliste = new ArrayList<String>();
 		FilenameFilter filter = new FilenameFilter()
@@ -222,7 +285,7 @@ public class SampleView extends ViewPart
 				return name.endsWith(".py");
 			}
 		};
-		File dir = new File(Activator.getPluginPath() + "/scripts");
+		File dir = new File(Activator.getPluginPath() + "/scripts/" + parent);
 		String[] dirfiles = dir.list(filter);
 		if (dirfiles == null)
 		{
@@ -236,10 +299,17 @@ public class SampleView extends ViewPart
 		return sliste;
 	}
 
-	private void runScrit(String name)
+	private String getScriptDescription(String cat,String name)
+	{
+			EngineFactory engineFactory = EngineFactory.getInstance();
+			Engine engine = engineFactory.getEngine(cat, name);
+			return engine.getDescription();
+	}
+	
+	private void runScrit(String cat, String name)
 	{
 		EngineFactory engineFactory = EngineFactory.getInstance();
-		Engine engine = engineFactory.getEngine(name);
+		Engine engine = engineFactory.getEngine(cat, name);
 		TextBean txt = RessourceAcces.getTextBean();
 		String filtered = engine.filter(txt.getText(), txt
 				.getSelectionStartOffset(), txt.getSelectionEndOffset(), txt

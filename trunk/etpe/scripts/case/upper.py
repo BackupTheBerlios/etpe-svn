@@ -6,14 +6,13 @@ See the LICENSE file for details.
 """
 from org.chub.etpe.engines import Engine
 
-class wordcount(Engine):
+class upper(Engine):
 	def getDescription(self):
-		return "count the number of word of the selection"
+		return "convert selection to upper case"
 	
 	def getReplaceType(self):
-		return Engine.REPLACE_NONE
+		return Engine.REPLACE_SELECTION
 	
 	def filter(self, text, startOffset, endOffset, startLine, endLine):
-		sel = text[startOffset:endOffset]
-		print len(sel.split()), "words" 
-		return ""
+		selection = text[startOffset : endOffset]
+		return selection.upper()

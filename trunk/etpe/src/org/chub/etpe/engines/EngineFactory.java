@@ -35,25 +35,28 @@ public class EngineFactory
 		return instance;
 	}
 	
-	public Engine getEngine(String name) 
+	public Engine getEngine(String cat, String name) 
 	{
 //		if (loadedEngines.containsKey(name))
 //			return loadedEngines.get(name);
 		if (name.endsWith(".py"))
 		{
-			Engine engine = getPythonEngine(name);
+			Engine engine = getPythonEngine(cat, name);
 			loadedEngines.put(name, engine);
 			return engine;
 		}
 		throw (new Error("No engine for running " + name));
 	}
 	
-	private Engine getPythonEngine(String name)
+	private Engine getPythonEngine(String cat, String name)
 	{
 		try
 		{
 			PythonInterpreter interpreter = new PythonInterpreter();
-			interpreter.execfile(Activator.getPluginPath() + "/scripts/" + name);
+			if (cat != null)
+				interpreter.execfile(Activator.getPluginPath() + "/scripts/" + cat + "/"+ name);
+			else
+				interpreter.execfile(Activator.getPluginPath() + "/scripts/" + name);
 			interpreter.exec("obj = " + name.substring(0, name.lastIndexOf(".")) + "()");
 			return (Engine) interpreter.get("obj").__tojava__(Engine.class);
 		}

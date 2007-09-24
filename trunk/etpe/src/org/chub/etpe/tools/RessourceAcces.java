@@ -52,6 +52,12 @@ public class RessourceAcces
 		IDocument doc = dp.getDocument(textEditor.getEditorInput());
 		return doc.get();
 	}
+	
+	public static String getDocumentTitle()
+	{
+		ITextEditor textEditor = getTextEditor();
+		return textEditor.getTitle();
+	}
 
 	public static TextBean getTextBean()
 	{
