@@ -27,6 +27,13 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.RowLayout;
+import swing2swt.layout.BorderLayout;
+import swing2swt.layout.FlowLayout;
 import org.eclipse.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.layout.grouplayout.LayoutStyle;
 import org.eclipse.swt.widgets.Composite;
@@ -82,9 +89,48 @@ public class SampleView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		
+
+		parent.setLayout(new FormLayout());
+		text = new Text(parent, SWT.BORDER);
+		final FormData fd_text = new FormData();
+		fd_text.right = new FormAttachment(100, -5);
+		fd_text.bottom = new FormAttachment(0, 24);
+		fd_text.top = new FormAttachment(0, 5);
+		text.setLayoutData(fd_text);
+		text.addKeyListener(new KeyAdapter()
+		{
+			public void keyReleased(KeyEvent e)
+			{
+				String txt = text.getText();
+				Pattern pattern = Pattern.compile(txt + ".*");
+				for (TreeItem t : tree.getItems())
+				{
+					String name = t.getText();
+					Matcher m = pattern.matcher(name);
+					if (m.matches())
+					{
+						tree.setSelection(t);
+						if (!txt.isEmpty() && e.keyCode == SWT.CR)
+						{
+							String catName = null;
+							TreeItem treei = tree.getSelection()[0].getParentItem();
+							if (treei != null)
+								catName = treei.getText();
+							runScrit(catName, name);
+						}
+						return;
+					}
+				}
+			}
+		});
 
 		tree = new Tree(parent, SWT.FULL_SELECTION | SWT.BORDER);
+		final FormData fd_tree = new FormData();
+		fd_tree.right = new FormAttachment(text, 0, SWT.RIGHT);
+		fd_tree.top = new FormAttachment(text, 5, SWT.BOTTOM);
+		fd_tree.left = new FormAttachment(0, 5);
+		tree.setLayoutData(fd_tree);
+		tree.setLayout(new RowLayout());
 		tree.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -125,69 +171,25 @@ public class SampleView extends ViewPart
 			}
 		});
 		tree.setLinesVisible(true);
-
-		descr = new Text(parent, SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
-
-		text = new Text(parent, SWT.BORDER);
-		text.addKeyListener(new KeyAdapter()
-		{
-			public void keyReleased(KeyEvent e)
-			{
-				String txt = text.getText();
-				Pattern pattern = Pattern.compile(txt + ".*");
-				for (TreeItem t : tree.getItems())
-				{
-					String name = t.getText();
-					Matcher m = pattern.matcher(name);
-					if (m.matches())
-					{
-						tree.setSelection(t);
-						if (!txt.isEmpty() && e.keyCode == SWT.CR)
-						{
-							String catName = null;
-							TreeItem treei = tree.getSelection()[0].getParentItem();
-							if (treei != null)
-								catName = treei.getText();
-							runScrit(catName, name);
-						}
-						return;
-					}
-				}
-			}
-		});
-
 		Label searchLabel;
 		searchLabel = new Label(parent, SWT.NONE);
+		fd_text.left = new FormAttachment(searchLabel, 5, SWT.RIGHT);
+		final FormData fd_searchLabel = new FormData();
+		fd_searchLabel.bottom = new FormAttachment(text, 13, SWT.TOP);
+		fd_searchLabel.top = new FormAttachment(text, 0, SWT.TOP);
+		fd_searchLabel.right = new FormAttachment(0, 42);
+		fd_searchLabel.left = new FormAttachment(0, 10);
+		searchLabel.setLayoutData(fd_searchLabel);
 		searchLabel.setText("search");
-		
-		final GroupLayout groupLayout = new GroupLayout(parent);
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(GroupLayout.LEADING)
-				.add(groupLayout.createSequentialGroup()
-					.add(searchLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(LayoutStyle.RELATED)
-					.add(text, GroupLayout.PREFERRED_SIZE, 484, Short.MAX_VALUE)
-					.addContainerGap())
-				.add(groupLayout.createSequentialGroup()
-					.add(10, 10, 10)
-					.add(groupLayout.createParallelGroup(GroupLayout.LEADING)
-						.add(GroupLayout.TRAILING, descr, GroupLayout.PREFERRED_SIZE, 519, Short.MAX_VALUE)
-						.add(GroupLayout.TRAILING, tree, GroupLayout.PREFERRED_SIZE, 519, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(GroupLayout.LEADING)
-				.add(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.add(groupLayout.createParallelGroup(GroupLayout.BASELINE)
-						.add(searchLabel)
-						.add(text, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(LayoutStyle.RELATED)
-					.add(tree, GroupLayout.PREFERRED_SIZE, 91, Short.MAX_VALUE)
-					.addPreferredGap(LayoutStyle.RELATED)
-					.add(descr, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
-		);
-		parent.setLayout(groupLayout);
+
+		descr = new Text(parent, SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
+		fd_tree.bottom = new FormAttachment(descr, 0, SWT.TOP);
+		final FormData fd_descr = new FormData();
+		fd_descr.top = new FormAttachment(72, 0);
+		fd_descr.right = new FormAttachment(tree, 0, SWT.RIGHT);
+		fd_descr.bottom = new FormAttachment(100, -5);
+		fd_descr.left = new FormAttachment(tree, 0, SWT.LEFT);
+		descr.setLayoutData(fd_descr);
 
 		for (String c : buildCatList())
 		{
