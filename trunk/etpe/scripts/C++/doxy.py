@@ -17,22 +17,31 @@ class doxy(Engine):
 		return Engine.REPLACE_ALL
 	
 	def delimRemove(self, str):
-		#FIXME
-		sub = str.find("<")
-		if sub != -1:
-			return str[:sub] + delimRemove(str[sub + 1:])
-		end = str.find(">")
-		if end != -1:
-			return str #WTF unbalanced delim
-		return str[:sub] + str[end + 1:]
-		
-		
-	
+		# count bracet
+		def removeFirstBracet(str):
+			b_cnt = 0
+			b_open_pos = str.find("<")
+			b_close_pos = 0
+			for (i, c) in enumerate(str):
+				if c == '<':
+					b_cnt += 1
+				elif c == '>':
+					b_cnt -= 1
+					b_close_pos = i
+					if b_cnt == 0:
+						str =  str[:b_open_pos] + str[b_close_pos + 1:]
+						return str
+			if b_cnt != 0:
+				raise "unbalanced string"
+		while str.find("<") != -1:
+			str = removeFirstBracet(str)
+		return str
+
 	def getArgsName(self, line):
 		"""
 		extract arguments name of the curent method
 		"""
-		#we look for the argument position foo(bar baz, bar2 baz2, ...)
+		#we look for the argument's position "type foo(bar baz, bar2 baz2, ...)"
 		args_d = line.find("(")
 		args_f = line.rfind(")")
 		if args_d == -1 or args_f == -1:
@@ -46,11 +55,25 @@ class doxy(Engine):
 				.replace("*", "")
 				.strip() for a in args_txt]
 		#we split every arguments and take the last word who might be the argument name (I hope)
+
+	def hasReturn(self, line):
+		print line.split()[0]
+		if line.split()[0] == "void":
+			return False
+		return True
 	
 	def filter(self, text, startOffset, endOffset, startLine, endLine):
 		inBuf = StringIO.StringIO(text)
 		strarray = inBuf.readlines()
 		line = strarray[startLine]
-		for i in self.getArgsName(line):
-			print i
-		return text
+		doxytxt = """
+/* 
+ * @brief:
+ * 
+"""
+		doxytxt +=  "\n".join([" * @param %(name)s:" % {"name" : i} for i in self.getArgsName(line)])
+		if self.hasReturn(line):
+			doxytxt += "\n *\n * @return:"
+		doxytxt += "\n */\n"	 
+		strarray.insert(startLine, doxytxt)
+		return string.join(strarray, "")

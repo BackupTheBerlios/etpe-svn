@@ -27,15 +27,10 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowLayout;
-import swing2swt.layout.BorderLayout;
-import swing2swt.layout.FlowLayout;
-import org.eclipse.swt.layout.grouplayout.GroupLayout;
-import org.eclipse.swt.layout.grouplayout.LayoutStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -64,9 +59,10 @@ public class SampleView extends ViewPart
 {
 
 	private Text text;
-	private Text descr;
-	private Tree tree;
 
+	private Text descr;
+
+	private Tree tree;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -113,7 +109,8 @@ public class SampleView extends ViewPart
 						if (!txt.isEmpty() && e.keyCode == SWT.CR)
 						{
 							String catName = null;
-							TreeItem treei = tree.getSelection()[0].getParentItem();
+							TreeItem treei = tree.getSelection()[0]
+									.getParentItem();
 							if (treei != null)
 								catName = treei.getText();
 							runScrit(catName, name);
@@ -131,7 +128,8 @@ public class SampleView extends ViewPart
 		fd_tree.left = new FormAttachment(0, 5);
 		tree.setLayoutData(fd_tree);
 		tree.setLayout(new RowLayout());
-		tree.addSelectionListener(new SelectionAdapter() {
+		tree.addSelectionListener(new SelectionAdapter()
+		{
 			public void widgetSelected(SelectionEvent e)
 			{
 				String scriptName = tree.getSelection()[0].getText();
@@ -154,7 +152,7 @@ public class SampleView extends ViewPart
 					if (treei != null)
 						catName = treei.getText();
 					String scriptName = tree.getSelection()[0].getText();
-					runScrit(catName ,scriptName);
+					runScrit(catName, scriptName);
 				}
 			}
 		});
@@ -182,7 +180,8 @@ public class SampleView extends ViewPart
 		searchLabel.setLayoutData(fd_searchLabel);
 		searchLabel.setText("search");
 
-		descr = new Text(parent, SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
+		descr = new Text(parent, SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY
+				| SWT.MULTI | SWT.BORDER);
 		fd_tree.bottom = new FormAttachment(descr, 0, SWT.TOP);
 		final FormData fd_descr = new FormData();
 		fd_descr.top = new FormAttachment(72, 0);
@@ -195,13 +194,13 @@ public class SampleView extends ViewPart
 		{
 			TreeItem newItemTreeItem = new TreeItem(tree, SWT.NONE);
 			newItemTreeItem.setText(c);
-			for (String s: buildFilterList(c))
+			for (String s : buildFilterList(c))
 			{
 				TreeItem treeItem2 = new TreeItem(newItemTreeItem, SWT.NONE);
 				treeItem2.setText(s);
 			}
 		}
-		for (String s: buildFilterList("."))
+		for (String s : buildFilterList("."))
 		{
 			TreeItem treeItem2 = new TreeItem(tree, SWT.NONE);
 			treeItem2.setText(s);
@@ -263,8 +262,6 @@ public class SampleView extends ViewPart
 	{
 	}
 
-	
-	
 	private ArrayList<String> buildCatList()
 	{
 		ArrayList<String> sliste = new ArrayList<String>();
@@ -301,13 +298,13 @@ public class SampleView extends ViewPart
 		return sliste;
 	}
 
-	private String getScriptDescription(String cat,String name)
+	private String getScriptDescription(String cat, String name)
 	{
-			EngineFactory engineFactory = EngineFactory.getInstance();
-			Engine engine = engineFactory.getEngine(cat, name);
-			return engine.getDescription();
+		EngineFactory engineFactory = EngineFactory.getInstance();
+		Engine engine = engineFactory.getEngine(cat, name);
+		return engine.getDescription();
 	}
-	
+
 	private void runScrit(String cat, String name)
 	{
 		EngineFactory engineFactory = EngineFactory.getInstance();
